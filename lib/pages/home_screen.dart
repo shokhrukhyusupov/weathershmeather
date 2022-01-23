@@ -1,6 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:weathershmeather/bloc/maps_bloc/maps_bloc.dart';
+import 'package:weathershmeather/bloc/maps_bloc/maps_event.dart';
 import 'package:weathershmeather/bloc/weather_bloc/weather_bloc.dart';
 import 'package:weathershmeather/bloc/weather_bloc/weather_event.dart';
 import 'package:weathershmeather/bloc/weather_bloc/weather_state.dart';
@@ -14,16 +18,68 @@ import 'package:weathershmeather/pages/weather_forecast_screen.dart';
 
 import 'skeleton_home_screen.dart';
 
+class HomePage extends StatelessWidget {
+  final String email, uid, displayName;
+  const HomePage({
+    required this.email,
+    required this.uid,
+    required this.displayName,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final Stream<QuerySnapshot<Map<String, dynamic>>> places = FirebaseFirestore
+        .instance
+        .collection('users')
+        .doc(uid)
+        .collection('address')
+        .snapshots();
+    return StreamBuilder<QuerySnapshot>(
+      stream: places,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final data = snapshot.requireData;
+          try {
+            return HomeScreen(
+              displayName: displayName,
+              email: email,
+              uid: uid,
+              place: data.docs[0]['formattedAddress'],
+              lat: data.docs[0]['lat'].toString(),
+              lng: data.docs[0]['lng'].toString(),
+            );
+          } catch (e) {
+            return HomeScreen(
+              displayName: displayName,
+              email: email,
+              uid: uid,
+            );
+          }
+        }
+        if (snapshot.hasError) {
+          return const Center(child: CircularProgressIndicator());
+        } else {
+          return const Center(child: CircularProgressIndicator());
+        }
+      },
+    );
+  }
+}
+
 class HomeScreen extends StatefulWidget {
   final String email, uid, displayName;
-  final String? photoUrl;
-  const HomeScreen(
-      {required this.email,
-      required this.uid,
-      required this.displayName,
-      this.photoUrl,
-      Key? key})
-      : super(key: key);
+  final String? place, lat, lng;
+  const HomeScreen({
+    required this.email,
+    required this.uid,
+    required this.displayName,
+    this.place,
+    this.lat,
+    this.lng,
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<HomeScreen> createState() => HomeScreenState();
@@ -37,7 +93,9 @@ class HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     BlocProvider.of<WeatherBloc>(context)
-        .add(WeatherCurrentPositionRequested());
+        .add(WeatherCurrentPositionRequested(widget.lat, widget.lng));
+    BlocProvider.of<MapsBloc>(context)
+        .add(SelectedLocationRequested(widget.place));
   }
 
   @override
@@ -46,9 +104,17 @@ class HomeScreenState extends State<HomeScreen> {
       body: BlocBuilder<WeatherBloc, WeatherState>(
         builder: (context, state) {
           if (state is WeatherLoadSuccess) {
+            if (widget.place == null) {
+              final timezone = state.currentWeather.timezone!.split('/');
+              BlocProvider.of<MapsBloc>(context)
+                  .add(SelectedLocationRequested(timezone[1]));
+            }
             return Stack(
               children: [
-                const DrawerScreen(),
+                DrawerScreen(
+                  displayName: widget.displayName,
+                  email: widget.email,
+                ),
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 250),
                   transform: Matrix4.translationValues(xOffset, yOffset, 0)
@@ -58,10 +124,10 @@ class HomeScreenState extends State<HomeScreen> {
                     color: const Color(0xFFF7F7F7),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        offset: const Offset(-5, 15),
+                        color: Colors.black.withOpacity(0.1),
+                        offset: const Offset(-2, 10),
                         blurRadius: 15,
-                        spreadRadius: 0,
+                        spreadRadius: 3,
                       )
                     ],
                   ),
@@ -71,7 +137,6 @@ class HomeScreenState extends State<HomeScreen> {
                         email: widget.email,
                         uid: widget.uid,
                         displayName: widget.displayName,
-                        photoUrl: widget.photoUrl,
                       ),
                       Locatia(state.currentWeather),
                       HomeScreenWeather(

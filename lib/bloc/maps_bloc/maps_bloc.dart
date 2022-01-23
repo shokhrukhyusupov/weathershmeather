@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:weathershmeather/models/place.dart';
+import 'package:weathershmeather/repository/maps_repository.dart';
 import 'package:weathershmeather/services/location_service.dart';
 
 import 'maps_event.dart';
@@ -9,10 +10,11 @@ import 'maps_state.dart';
 import 'maps_status.dart';
 
 class MapsBloc extends Bloc<MapsEvent, MapsState> {
-  MapsBloc() : super(MapsState()) {
+  final MapsRepository mapsRepo;
+  MapsBloc({required this.mapsRepo}) : super(MapsState()) {
     on<SelectedLocationRequested>((event, emit) async {
       try {
-        final List<Place> places = await LocationService.getPlace(event.place);
+        final List<Place> places = await LocationService.getPlace(event.place ?? 'London');
         emit(state.copyWith(places: places, mapsStatus: MapsLoadedSuccess()));
       } catch (e) {
         emit(state.copyWith(mapsStatus: MapsLoadFailed(Exception(e))));
@@ -29,6 +31,12 @@ class MapsBloc extends Bloc<MapsEvent, MapsState> {
           icon: icon,
         ),
       }));
+    });
+    on<AddPlace>((event, emit) async {
+      emit(state.copyWith(place: event.place));
+    });
+    on<SavePlace>((event, emit) async {
+      await mapsRepo.savePlace(place: state.place!);
     });
   }
 }

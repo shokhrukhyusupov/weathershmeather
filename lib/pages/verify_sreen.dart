@@ -8,7 +8,9 @@ import 'package:weathershmeather/repository/auth_repository.dart';
 import 'package:weathershmeather/pages/auth_screen.dart';
 
 class VerifyScreen extends StatefulWidget {
-  const VerifyScreen({Key? key}) : super(key: key);
+  final String displayName;
+  final String? photoUrl;
+  const VerifyScreen({required this.displayName, this.photoUrl, Key? key}) : super(key: key);
 
   @override
   _VerifyScreenState createState() => _VerifyScreenState();
@@ -77,11 +79,13 @@ class _VerifyScreenState extends State<VerifyScreen> {
     setState(() => timerTick--);
     if (user.emailVerified) {
       timer.cancel();
+      await user.updateDisplayName(widget.displayName);
+      await user.updatePhotoURL(widget.photoUrl);
       await _users.doc(user.uid).set({
         'uid': user.uid,
         'email': user.email,
-        'displayName': user.displayName,
-        'photoUrl': user.photoURL,
+        'displayName': widget.displayName,
+        'photoUrl': widget.photoUrl,
       });
       Navigator.pushAndRemoveUntil(
         context,

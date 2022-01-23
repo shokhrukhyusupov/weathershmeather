@@ -1,5 +1,16 @@
 abstract class AuthEvents {}
 
+class AuthPhotoUrlChanged extends AuthEvents {
+  final String photoUrl;
+
+  AuthPhotoUrlChanged({required this.photoUrl});
+}
+class AuthDisplaynameChanged extends AuthEvents {
+  final String displayName;
+
+  AuthDisplaynameChanged({required this.displayName});
+}
+
 class AuthEmailChanged extends AuthEvents {
   final String email;
   AuthEmailChanged({required this.email});
@@ -35,3 +46,9 @@ class AuthButtonStatus extends AuthEvents {
 class AuthSubmit extends AuthEvents {}
 
 class GoogleSubmit extends AuthEvents {}
+
+class AuthSignOut extends AuthEvents {
+  final String auth;
+
+  AuthSignOut(this.auth);
+}

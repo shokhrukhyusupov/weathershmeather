@@ -14,6 +14,7 @@ import 'package:weathershmeather/styles.dart';
 
 class AuthScreen extends StatelessWidget {
   AuthScreen({Key? key}) : super(key: key);
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -32,11 +33,10 @@ class AuthScreen extends StatelessWidget {
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => HomeScreen(
+                  builder: (context) => HomePage(
                     email: _formstatus.user.email!,
                     uid: _formstatus.user.uid,
                     displayName: _formstatus.user.displayName!,
-                    photoUrl: null,
                   ),
                 ),
                 (route) => false,
@@ -44,7 +44,9 @@ class AuthScreen extends StatelessWidget {
             } else {
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => const VerifyScreen()),
+                MaterialPageRoute(
+                    builder: (context) =>
+                        VerifyScreen(displayName: state.displayName)),
                 (route) => false,
               );
             }
@@ -52,11 +54,10 @@ class AuthScreen extends StatelessWidget {
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
-                builder: (context) => HomeScreen(
+                builder: (context) => HomePage(
                   email: _formstatus.signInAccount.email,
                   uid: _formstatus.signInAccount.id,
                   displayName: _formstatus.signInAccount.displayName!,
-                  photoUrl: _formstatus.signInAccount.photoUrl!,
                 ),
               ),
               (route) => false,
@@ -68,15 +69,50 @@ class AuthScreen extends StatelessWidget {
             child: Form(
               key: _formKey,
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Spacer(flex: 1),
+                  state.isLogin
+                      ? const SizedBox()
+                      : Column(children: [
+                          SizedBox(
+                            width: 123,
+                            height: 123,
+                            child: Stack(children: [
+                              Center(
+                                child: CircleAvatar(
+                                  radius: 65,
+                                  backgroundColor: Colors.blueAccent,
+                                  child: CircleAvatar(
+                                    radius: 60,
+                                    backgroundColor: Colors.grey[200],
+                                    child: const Icon(
+                                      Icons.person,
+                                      size: 80,
+                                      color: Colors.black38,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: IconButton(
+                                  onPressed: () {},
+                                  splashRadius: 1,
+                                  icon: const Icon(Icons.add_a_photo,
+                                      color: Colors.blueAccent),
+                                ),
+                              )
+                            ]),
+                          ),
+                          const SizedBox(height: 25),
+                          const UsernameFormFiled(),
+                          const SizedBox(height: 15)
+                        ]),
                   const EmailFormFiled(),
                   const SizedBox(height: 15),
                   const PasswordFormFiled(isConfirm: false),
-                  BlocBuilder<AuthBloc, AuthState>(
-                    builder: (context, state) {
-                      if (state.isLogin) {
-                        return Column(
+                  state.isLogin
+                      ? Column(
                           children: [
                             const SizedBox(height: 25),
                             TextButton(
@@ -87,82 +123,63 @@ class AuthScreen extends StatelessWidget {
                               child: const Text('Forgot your password?'),
                             ),
                           ],
-                        );
-                      } else {
-                        return Column(
+                        )
+                      : Column(
                           children: const [
                             SizedBox(height: 15),
                             PasswordFormFiled(isConfirm: true),
                           ],
-                        );
-                      }
-                    },
-                  ),
+                        ),
                   const SizedBox(height: 25),
                   ConfirimButton(formkey: _formKey),
-                  const Spacer(flex: 1),
-                  const Text(
-                    'OR SIGN IN WITH A',
-                    style: TextStyle(
-                      color: Colors.black26,
-                      fontSize: 20,
-                      wordSpacing: 1,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 25),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      SizedBox(
-                        height: 60,
-                        width: 150,
-                        child: ElevatedButton.icon(
-                            onPressed: state.buttonStatus
-                                ? () {
-                                    context.read<AuthBloc>().add(
-                                        AuthButtonStatus(buttonStatus: false));
-                                    context
-                                        .read<AuthBloc>()
-                                        .add(GoogleSubmit());
-                                  }
-                                : null,
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all(Colors.white)),
-                            icon: FaIcon(
-                              FontAwesomeIcons.google,
-                              size: 50,
-                              color: Colors.red[600],
+                  state.isLogin
+                      ? Column(children: [
+                          const Text(
+                            'OR',
+                            style: TextStyle(
+                              color: Colors.black26,
+                              fontSize: 20,
+                              wordSpacing: 1,
+                              fontWeight: FontWeight.w500,
                             ),
-                            label: const Text('oogle',
-                                style: TextStyle(
-                                    color: Colors.red,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold))),
-                      ),
-                      SizedBox(
-                        height: 60,
-                        width: 150,
-                        child: ElevatedButton.icon(
-                            onPressed: () {},
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all(Colors.white)),
-                            icon: FaIcon(
-                              FontAwesomeIcons.facebookF,
-                              size: 50,
-                              color: Colors.blue[800],
+                          ),
+                          const SizedBox(height: 25),
+                          Container(
+                            width: double.infinity,
+                            height: 60,
+                            margin: const EdgeInsets.symmetric(horizontal: 60),
+                            child: ElevatedButton(
+                              onPressed: state.buttonStatus
+                                  ? () {
+                                      context.read<AuthBloc>().add(
+                                          AuthButtonStatus(
+                                              buttonStatus: false));
+                                      context
+                                          .read<AuthBloc>()
+                                          .add(GoogleSubmit());
+                                    }
+                                  : null,
+                              style: ElevatedButton.styleFrom(
+                                elevation: 6,
+                                primary: Colors.red,
+                                shadowColor: Colors.red[600]!.withOpacity(0.5),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30)),
+                              ),
+                              child: Row(
+                                children: const [
+                                  FaIcon(FontAwesomeIcons.google, size: 40),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    'Sign in with Google',
+                                    style: TextStyle(fontSize: 18),
+                                  )
+                                ],
+                              ),
                             ),
-                            label: Text('acebook',
-                                style: TextStyle(
-                                    color: Colors.blue[800],
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold))),
-                      ),
-                    ],
-                  ),
+                          ),
+                        ])
+                      : const SizedBox(),
                 ],
               ),
             ),
@@ -178,15 +195,65 @@ class AuthScreen extends StatelessWidget {
   }
 }
 
-class EmailFormFiled extends StatelessWidget {
-  const EmailFormFiled({Key? key}) : super(key: key);
+class UsernameFormFiled extends StatefulWidget {
+  const UsernameFormFiled({Key? key}) : super(key: key);
 
+  @override
+  State<UsernameFormFiled> createState() => _UsernameFormFiledState();
+}
+
+class _UsernameFormFiledState extends State<UsernameFormFiled> {
+  TextEditingController textController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30.0),
         child: TextFormField(
+          controller: textController,
+          onChanged: (value) => context
+              .read<AuthBloc>()
+              .add(AuthDisplaynameChanged(displayName: value)),
+          validator: (value) => state.validateDisplayName
+              ? null
+              : 'Имя пользователя не может быть из символов',
+          keyboardType: TextInputType.emailAddress,
+          autofillHints: const [AutofillHints.email],
+          decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.person_outline),
+            hintText: 'Enter fullname',
+            hintStyle: kHintStyle,
+            labelText: 'Fullname',
+            labelStyle: kHintStyle,
+            border: textController.text.isEmpty
+                ? kOutlineBorder
+                : kOutlineFocusedBorder,
+            focusedBorder: kOutlineFocusedBorder,
+            filled: true,
+            fillColor: Colors.grey.withOpacity(0.1),
+          ),
+        ),
+      );
+    });
+  }
+}
+
+class EmailFormFiled extends StatefulWidget {
+  const EmailFormFiled({Key? key}) : super(key: key);
+
+  @override
+  State<EmailFormFiled> createState() => _EmailFormFiledState();
+}
+
+class _EmailFormFiledState extends State<EmailFormFiled> {
+  TextEditingController textController = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30.0),
+        child: TextFormField(
+          controller: textController,
           onChanged: (value) => context
               .read<AuthBloc>()
               .add(AuthEmailChanged(email: value.toLowerCase())),
@@ -201,7 +268,9 @@ class EmailFormFiled extends StatelessWidget {
             hintStyle: kHintStyle,
             labelText: 'Email',
             labelStyle: kHintStyle,
-            border: kOutlineBorder,
+            border: textController.text.isEmpty
+                ? kOutlineBorder
+                : kOutlineFocusedBorder,
             focusedBorder: kOutlineFocusedBorder,
             filled: true,
             fillColor: Colors.grey.withOpacity(0.1),
@@ -212,34 +281,44 @@ class EmailFormFiled extends StatelessWidget {
   }
 }
 
-class PasswordFormFiled extends StatelessWidget {
+class PasswordFormFiled extends StatefulWidget {
   final bool isConfirm;
   const PasswordFormFiled({required this.isConfirm, Key? key})
       : super(key: key);
+
+  @override
+  State<PasswordFormFiled> createState() => _PasswordFormFiledState();
+}
+
+class _PasswordFormFiledState extends State<PasswordFormFiled> {
+  TextEditingController textController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30.0),
         child: TextFormField(
-          onChanged: (value) => isConfirm
+          controller: textController,
+          onChanged: (value) => widget.isConfirm
               ? context
                   .read<AuthBloc>()
                   .add(AuthPasswordConfirimChanged(password: value))
               : context
                   .read<AuthBloc>()
                   .add(AuthPasswordChanged(password: value)),
-          validator: (value) => isConfirm
+          validator: (value) => widget.isConfirm
               ? (state.validateConfirimPassword ? null : 'Пароли не совпадают')
               : (state.validatePassword ? null : 'Минимальное кол-во знаков-6'),
           obscureText: state.isObscure,
           decoration: InputDecoration(
             prefixIcon: const Icon(Icons.lock_outline_rounded),
-            hintText: isConfirm ? 'Re-enter password' : 'Enter password',
+            hintText: widget.isConfirm ? 'Re-enter password' : 'Enter password',
             hintStyle: kHintStyle,
-            labelText: isConfirm ? 'Confirm password' : 'Password',
+            labelText: widget.isConfirm ? 'Confirm password' : 'Password',
             labelStyle: kHintStyle,
-            border: kOutlineBorder,
+            border: textController.text.isEmpty
+                ? kOutlineBorder
+                : kOutlineFocusedBorder,
             focusedBorder: kOutlineFocusedBorder,
             filled: true,
             fillColor: Colors.grey.withOpacity(0.1),

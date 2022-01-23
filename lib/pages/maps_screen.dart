@@ -34,14 +34,14 @@ class _MapsScreenState extends State<MapsScreen>
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<MapsBloc>(context)
-        .add(SelectedLocationRequested('ташкент'));
     animationController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 400));
-    offsetSearchBar = Tween<Offset>(begin: Offset.zero, end: const Offset(0.0, -0.2))
-        .animate(animationController);
-    offsetBottomSheet = Tween<Offset>(begin: Offset.zero, end: const Offset(0.0, 0.3))
-        .animate(animationController);
+    offsetSearchBar =
+        Tween<Offset>(begin: Offset.zero, end: const Offset(0.0, -0.2))
+            .animate(animationController);
+    offsetBottomSheet =
+        Tween<Offset>(begin: Offset.zero, end: const Offset(0.0, 0.3))
+            .animate(animationController);
   }
 
   @override
@@ -66,9 +66,12 @@ class _MapsScreenState extends State<MapsScreen>
                       mapType: mapType,
                       compassEnabled: false,
                       zoomControlsEnabled: false,
-                      initialCameraPosition: const CameraPosition(
-                          target: LatLng(39.2121, 69.1151), zoom: 12),
-                      onMapCreated: (controller) => completer.complete(controller),
+                      initialCameraPosition: CameraPosition(
+                          target: LatLng(
+                              state.places![0].lat, state.places![0].lng),
+                          zoom: 12),
+                      onMapCreated: (controller) =>
+                          completer.complete(controller),
                       onLongPress: (position) async {
                         BlocProvider.of<MapsBloc>(context)
                             .add(MarkedLocation(position));

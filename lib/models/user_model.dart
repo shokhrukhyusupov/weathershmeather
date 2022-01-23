@@ -9,7 +9,7 @@ class UserModel {
     this.password,
   });
 
-  factory UserModel.fromMap(map) {
+  factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
       uid: map['uid'],
       email: map['email'],
@@ -23,5 +23,17 @@ class UserModel {
       'email': email,
       'password': password,
     };
+  }
+}
+
+class UserPlace {
+  final String formattedAddress;
+
+  UserPlace({required this.formattedAddress});
+
+  factory UserPlace.fromJson(Map<String, dynamic> json) {
+    return UserPlace(
+      formattedAddress: json['formattedAddress']
+    );
   }
 }

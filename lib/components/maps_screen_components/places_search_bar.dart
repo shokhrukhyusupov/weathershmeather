@@ -40,7 +40,7 @@ class PlacesSearchBar extends StatelessWidget {
         width: isPortrait ? 600 : 500,
         borderRadius: BorderRadius.circular(12),
         debounceDelay: const Duration(milliseconds: 500),
-        onQueryChanged: (query) {
+        onSubmitted: (query) {
           BlocProvider.of<MapsBloc>(context)
               .add(SelectedLocationRequested(searchController.query));
         },
@@ -72,18 +72,20 @@ class PlacesSearchBar extends StatelessWidget {
               itemCount: places.length,
               itemBuilder: (context, i) {
                 return ListTile(
-                  title: Text(places[i].name),
-                  subtitle: Text(places[i].country),
+                  title: Text(places[i].placeName),
+                  subtitle: Text(places[i].formattedAddress),
                   onTap: () async {
                     final mapController = await completer.future;
                     mapController.animateCamera(
                       CameraUpdate.newCameraPosition(
                         CameraPosition(
-                          target: places[i].latLng,
+                          target: LatLng(places[i].lat, places[i].lng),
                           zoom: 12,
                         ),
                       ),
                     );
+                    BlocProvider.of<MapsBloc>(context)
+                        .add(AddPlace(place: places[i]));
                     FloatingSearchBar.of(context)!.close();
                   },
                 );

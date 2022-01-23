@@ -1,29 +1,22 @@
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-
 class Place {
-  final String country;
-  final String city;
-  final String name;
-  final LatLng latLng;
+  final String formattedAddress;
+  final String placeName;
+  final double lat;
+  final double lng;
 
   Place({
-    required this.country,
-    required this.city,
-    required this.name,
-    required this.latLng,
+    required this.formattedAddress,
+    required this.placeName,
+    required this.lat,
+    required this.lng,
   });
 
   factory Place.fromMap(map) {
-    List formattedAddress = (map['formatted_address'] as String).split(',');
-    bool length = formattedAddress.length == 3;
     return Place(
-      country: length ? formattedAddress[2] : formattedAddress[1],
-      city: length ? formattedAddress[1] : formattedAddress[0],
-      name: map['name'] ?? (length ? formattedAddress[0] : '-'),
-      latLng: LatLng(
-        map['geometry']['location']['lat'],
-        map['geometry']['location']['lng'],
-      ),
+      formattedAddress: map['formatted_address'],
+      placeName: map['name'],
+      lat: map['geometry']['location']['lat'],
+      lng: map['geometry']['location']['lng'],
     );
   }
 }

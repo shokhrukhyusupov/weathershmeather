@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:weathershmeather/bloc/auth_bloc/auth_event.dart';
 import 'package:weathershmeather/bloc/auth_bloc/auth_state.dart';
@@ -8,6 +9,9 @@ import '../../repository/auth_repository.dart';
 class AuthBloc extends Bloc<AuthEvents, AuthState> {
   final AuthRepository authRepo;
   AuthBloc({required this.authRepo}) : super(AuthState()) {
+    on<AuthDisplaynameChanged>((event, emit) async {
+      emit(state.copyWith(displayName: event.displayName));
+    });
     on<AuthEmailChanged>((event, emit) async {
       emit(state.copyWith(email: event.email));
     });
@@ -64,6 +68,20 @@ class AuthBloc extends Bloc<AuthEvents, AuthState> {
         final auth = await authRepo.googleSignIn();
         emit(state.copyWith(
             formStatus: SubmittionSuccessForGoogle(signInAccount: auth)));
+      } catch (e) {
+        emit(state.copyWith(formStatus: SubmittionError(Exception(e))));
+        emit(state.copyWith(formStatus: const InitialStatus()));
+      }
+      emit(state.copyWith(buttonStatus: true));
+    });
+    on<AuthSignOut>((event, emit) {
+      try {
+        final auth = FirebaseAuth.instance.currentUser!.email;
+        if (event.auth == auth) {
+          authRepo.signOutfromEmail();
+        } else {
+          authRepo.signOutFromGoogle();
+        }
       } catch (e) {
         emit(state.copyWith(formStatus: SubmittionError(Exception(e))));
         emit(state.copyWith(formStatus: const InitialStatus()));

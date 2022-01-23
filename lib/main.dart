@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skeletons/skeletons.dart';
+import 'package:weathershmeather/bloc/auth_bloc/auth_bloc.dart';
+import 'package:weathershmeather/repository/maps_repository.dart';
 
 import 'bloc/landing_bloc/landing_bloc.dart';
 import 'repository/auth_repository.dart';
@@ -24,29 +26,30 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    return MultiBlocProvider(
+    return MultiRepositoryProvider(
       providers: [
-        BlocProvider(create: (context) => WeatherBloc()),
-        BlocProvider(create: (context) => MapsBloc()),
+        RepositoryProvider(create: (_) => MapsRepository()),
+        RepositoryProvider(create: (_) => AuthRepository()),
       ],
-      child: Builder(builder: (context) {
-        return RepositoryProvider(
-          create: (_) => AuthRepository(),
-          child: SkeletonTheme(
-            shimmerGradient: kShimmerGradient,
-            darkShimmerGradient: kDarkShimmerGradient,
-            child: MaterialApp(
-              debugShowCheckedModeBanner: false,
-              title: 'Weather-shmeather',
-              theme: ThemeData(primarySwatch: Colors.blue),
-              home: BlocProvider(
-                create: (context) => LandingBloc(authRepo: AuthRepository()),
-                child: const LandingScreen(),
-              ),
-            ),
+      child: SkeletonTheme(
+        shimmerGradient: kShimmerGradient,
+        darkShimmerGradient: kDarkShimmerGradient,
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider(create: (_) => MapsBloc(mapsRepo: MapsRepository())),
+            BlocProvider(
+                create: (_) => LandingBloc(authRepo: AuthRepository())),
+            BlocProvider(create: (_) => AuthBloc(authRepo: AuthRepository())),
+            BlocProvider(create: (_) => WeatherBloc(mapsRepo: MapsRepository()))
+          ],
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Weather-shmeather',
+            theme: ThemeData(primarySwatch: Colors.blue),
+            home: const LandingScreen(),
           ),
-        );
-      }),
+        ),
+      ),
     );
   }
 }

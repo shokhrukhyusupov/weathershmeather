@@ -34,11 +34,10 @@ class _LandingScreenState extends State<LandingScreen> {
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
-                builder: (context) => HomeScreen(
+                builder: (context) => HomePage(
                   email: _formstatus.user.email!,
                   uid: _formstatus.user.uid,
                   displayName: _formstatus.user.displayName!,
-                  photoUrl: null,
                 ),
               ),
               (route) => false,
@@ -47,11 +46,10 @@ class _LandingScreenState extends State<LandingScreen> {
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
-                builder: (context) => HomeScreen(
+                builder: (context) => HomePage(
                   email: _formstatus.signInAccount.email,
                   uid: _formstatus.signInAccount.id,
                   displayName: _formstatus.signInAccount.displayName!,
-                  photoUrl: _formstatus.signInAccount.photoUrl!,
                 ),
               ),
               (route) => false,

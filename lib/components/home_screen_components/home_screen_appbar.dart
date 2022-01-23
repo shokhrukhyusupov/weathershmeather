@@ -104,7 +104,6 @@ class _HomeScreenAppbarState extends State<HomeScreenAppbar> {
                     builder: (context) => ProfileScreen(
                       email: widget.email,
                       uid: widget.uid,
-                      photoUrl: widget.photoUrl,
                       displayName: widget.displayName,
                     ),
                   ),

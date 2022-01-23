@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -10,7 +9,6 @@ class AuthRepository {
       FirebaseFirestore.instance.collection('users');
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
-  final FacebookAuth _facebookAuth = FacebookAuth.instance;
   final _storage = const FlutterSecureStorage();
 
   Future<UserCredential> emailSignIn(String email, String password) async {
@@ -74,14 +72,24 @@ class AuthRepository {
     }
   }
 
-  Future<UserCredential> signInWithToken() async {
+  Future<User> signInWithToken() async {
     final email = await _storage.read(key: 'email') as String;
     final password = await _storage.read(key: 'password') as String;
     final user = await emailSignIn(email, password);
-    return user;
+    return user.user!;
   }
 
   Future<void> saveToken(String token) async {
     await _storage.write(key: 'token', value: token);
+  }
+
+  Future<void> signOutfromEmail() async {
+    _storage.delete(key: 'token');
+    await _firebaseAuth.signOut();
+  }
+
+  Future<void> signOutFromGoogle() async {
+    _storage.delete(key: 'token');
+    await _googleSignIn.signOut();
   }
 }

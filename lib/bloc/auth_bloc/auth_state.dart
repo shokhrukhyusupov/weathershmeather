@@ -1,6 +1,7 @@
 import 'package:weathershmeather/bloc/auth_bloc/auth_status.dart';
 
 class AuthState {
+  final String displayName;
   final String email;
   final String password;
   final String confirimPassword;
@@ -8,6 +9,8 @@ class AuthState {
   final bool isObscure;
   final bool buttonStatus;
   final FormSubmittionStatus formStatus;
+
+  get validateDisplayName => RegExp(r'^[a-z A-Z,.\-]+$').hasMatch(displayName);
 
   get validatePassword => password.length >= 6;
 
@@ -18,6 +21,7 @@ class AuthState {
   get validateConfirimPassword => password == confirimPassword;
 
   AuthState({
+    this.displayName = '',
     this.email = '',
     this.password = '',
     this.confirimPassword = '',
@@ -27,6 +31,7 @@ class AuthState {
     this.formStatus = const InitialStatus(),
   });
   AuthState copyWith({
+    String? displayName,
     String? email,
     String? password,
     String? confirimPassword,
@@ -36,6 +41,7 @@ class AuthState {
     FormSubmittionStatus? formStatus,
   }) {
     return AuthState(
+      displayName: displayName ?? this.displayName,
       email: email ?? this.email,
       password: password ?? this.password,
       confirimPassword: confirimPassword ?? this.confirimPassword,

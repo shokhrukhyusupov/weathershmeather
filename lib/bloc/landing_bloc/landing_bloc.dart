@@ -26,8 +26,7 @@ class LandingBloc extends Bloc<LandingEvent, LandingState> {
           if (token != null) {
             if (email != null) {
               final user = await authRepo.signInWithToken();
-              emit(state.copyWith(
-                  formStatus: LandingAuthedWithMail(user.user!)));
+              emit(state.copyWith(formStatus: LandingAuthedWithMail(user)));
             } else {
               final signInAccount = await authRepo.googleSignIn();
               emit(state.copyWith(
