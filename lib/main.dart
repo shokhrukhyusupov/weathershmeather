@@ -13,6 +13,8 @@ import 'bloc/weather_bloc/weather_bloc.dart';
 import 'pages/landing_screen.dart';
 import 'styles.dart';
 
+
+//blablbblablalblablalbalbla
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
