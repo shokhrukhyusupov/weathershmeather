@@ -1,9 +1,11 @@
 import 'package:weathershmeather/bloc/auth_bloc/auth_status.dart';
 
 class AuthState {
+  final String? photoUrl;
+  final String? fileUrl;
   final String displayName;
   final String email;
-  final String password;
+  final String password;  
   final String confirimPassword;
   final bool isLogin;
   final bool isObscure;
@@ -21,6 +23,8 @@ class AuthState {
   get validateConfirimPassword => password == confirimPassword;
 
   AuthState({
+    this.photoUrl,
+    this.fileUrl,
     this.displayName = '',
     this.email = '',
     this.password = '',
@@ -31,6 +35,8 @@ class AuthState {
     this.formStatus = const InitialStatus(),
   });
   AuthState copyWith({
+    String? photoUrl,
+    String? fileUrl,
     String? displayName,
     String? email,
     String? password,
@@ -41,6 +47,8 @@ class AuthState {
     FormSubmittionStatus? formStatus,
   }) {
     return AuthState(
+      photoUrl: photoUrl ?? this.photoUrl,
+      fileUrl: fileUrl ?? this.fileUrl,
       displayName: displayName ?? this.displayName,
       email: email ?? this.email,
       password: password ?? this.password,

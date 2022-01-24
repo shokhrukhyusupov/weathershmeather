@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:weathershmeather/repository/auth_repository.dart';
@@ -10,7 +11,8 @@ import 'package:weathershmeather/pages/auth_screen.dart';
 class VerifyScreen extends StatefulWidget {
   final String displayName;
   final String? photoUrl;
-  const VerifyScreen({required this.displayName, this.photoUrl, Key? key}) : super(key: key);
+  const VerifyScreen({required this.displayName, this.photoUrl, Key? key})
+      : super(key: key);
 
   @override
   _VerifyScreenState createState() => _VerifyScreenState();
@@ -47,8 +49,11 @@ class _VerifyScreenState extends State<VerifyScreen> {
       appBar: AppBar(
         title: const Text('Email Verification'),
         leading: IconButton(
-          onPressed: () {
+          onPressed: () async {
             user.delete();
+            await FirebaseStorage.instance
+                .refFromURL(widget.photoUrl!)
+                .delete();
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
@@ -101,6 +106,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
     if (timer.tick >= 120) {
       timer.cancel();
       user.delete();
+      await FirebaseStorage.instance.refFromURL(widget.photoUrl!).delete();
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(

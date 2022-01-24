@@ -42,6 +42,7 @@ dependencies:
   google_sign_in: ^5.2.1
   firebase_core: ^1.10.5
   cloud_firestore: ^3.1.5
+  firebase_storage: ^10.2.5
   google_maps_flutter: ^2.1.1
   location: ^4.3.0
   geolocator: ^8.0.1
@@ -52,6 +53,8 @@ dependencies:
   font_awesome_flutter: ^9.2.0
   skeletons: ^0.0.3
   connectivity: ^3.0.6
+  file_picker: ^4.3.2
+  open_file: ^3.2.1
   intl: ^0.17.0
 
 dev_dependencies:

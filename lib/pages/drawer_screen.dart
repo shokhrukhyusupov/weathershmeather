@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,7 +12,9 @@ import 'package:weathershmeather/pages/maps_screen.dart';
 
 class DrawerScreen extends StatelessWidget {
   final String displayName, email;
-  const DrawerScreen({required this.displayName, required this.email, Key? key})
+  final String? photoUrl;
+  const DrawerScreen(
+      {required this.displayName, required this.email, this.photoUrl, Key? key})
       : super(key: key);
 
   @override
@@ -37,12 +41,18 @@ class DrawerScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(
-                          height: 55,
-                          width: 55,
-                          child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: const Material(color: Colors.blueAccent))),
+                      photoUrl != null
+                          ? CircleAvatar(
+                              backgroundImage: NetworkImage(photoUrl!),
+                              radius: 30)
+                          : Container(
+                              width: 100,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                  color: Colors.blue,
+                                  borderRadius: BorderRadius.circular(15)),
+                              child: const Icon(Icons.person,
+                                  color: Colors.white, size: 32)),
                       const SizedBox(height: 15),
                       Text(displayName,
                           style: const TextStyle(

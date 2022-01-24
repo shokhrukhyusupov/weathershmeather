@@ -20,10 +20,12 @@ import 'skeleton_home_screen.dart';
 
 class HomePage extends StatelessWidget {
   final String email, uid, displayName;
+  final String? photoUrl;
   const HomePage({
     required this.email,
     required this.uid,
     required this.displayName,
+    this.photoUrl,
     Key? key,
   }) : super(key: key);
 
@@ -49,12 +51,14 @@ class HomePage extends StatelessWidget {
               place: data.docs[0]['formattedAddress'],
               lat: data.docs[0]['lat'].toString(),
               lng: data.docs[0]['lng'].toString(),
+              photoUrl: photoUrl,
             );
           } catch (e) {
             return HomeScreen(
               displayName: displayName,
               email: email,
               uid: uid,
+              photoUrl: photoUrl,
             );
           }
         }
@@ -70,7 +74,7 @@ class HomePage extends StatelessWidget {
 
 class HomeScreen extends StatefulWidget {
   final String email, uid, displayName;
-  final String? place, lat, lng;
+  final String? place, lat, lng, photoUrl;
   const HomeScreen({
     required this.email,
     required this.uid,
@@ -78,6 +82,7 @@ class HomeScreen extends StatefulWidget {
     this.place,
     this.lat,
     this.lng,
+    this.photoUrl,
     Key? key,
   }) : super(key: key);
 
@@ -114,6 +119,7 @@ class HomeScreenState extends State<HomeScreen> {
                 DrawerScreen(
                   displayName: widget.displayName,
                   email: widget.email,
+                  photoUrl: widget.photoUrl,
                 ),
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 250),

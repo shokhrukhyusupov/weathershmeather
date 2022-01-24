@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -37,6 +39,7 @@ class AuthScreen extends StatelessWidget {
                     email: _formstatus.user.email!,
                     uid: _formstatus.user.uid,
                     displayName: _formstatus.user.displayName!,
+                    photoUrl: _formstatus.user.photoURL,
                   ),
                 ),
                 (route) => false,
@@ -45,8 +48,9 @@ class AuthScreen extends StatelessWidget {
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>
-                        VerifyScreen(displayName: state.displayName)),
+                    builder: (context) => VerifyScreen(
+                        displayName: state.displayName,
+                        photoUrl: state.photoUrl)),
                 (route) => false,
               );
             }
@@ -58,6 +62,7 @@ class AuthScreen extends StatelessWidget {
                   email: _formstatus.signInAccount.email,
                   uid: _formstatus.signInAccount.id,
                   displayName: _formstatus.signInAccount.displayName!,
+                  photoUrl: _formstatus.signInAccount.photoUrl,
                 ),
               ),
               (route) => false,
@@ -85,18 +90,24 @@ class AuthScreen extends StatelessWidget {
                                   child: CircleAvatar(
                                     radius: 60,
                                     backgroundColor: Colors.grey[200],
-                                    child: const Icon(
-                                      Icons.person,
-                                      size: 80,
-                                      color: Colors.black38,
-                                    ),
+                                    backgroundImage: state.fileUrl != null
+                                        ? FileImage(File(state.fileUrl!))
+                                        : null,
+                                    child: state.fileUrl == null
+                                        ? const Icon(Icons.person,
+                                            size: 80, color: Colors.black38)
+                                        : null,
                                   ),
                                 ),
                               ),
                               Align(
                                 alignment: Alignment.bottomRight,
                                 child: IconButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    BlocProvider.of<AuthBloc>(context)
+                                        .add(AuthPhotoUrlChanged());
+                                    print(state.photoUrl);
+                                  },
                                   splashRadius: 1,
                                   icon: const Icon(Icons.add_a_photo,
                                       color: Colors.blueAccent),
