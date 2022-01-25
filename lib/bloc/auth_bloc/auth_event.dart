@@ -1,5 +1,3 @@
-import 'package:file_picker/file_picker.dart';
-
 abstract class AuthEvents {}
 
 class AuthPhotoUrlChanged extends AuthEvents {}

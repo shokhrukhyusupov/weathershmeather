@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -106,7 +107,6 @@ class AuthScreen extends StatelessWidget {
                                   onPressed: () {
                                     BlocProvider.of<AuthBloc>(context)
                                         .add(AuthPhotoUrlChanged());
-                                    print(state.photoUrl);
                                   },
                                   splashRadius: 1,
                                   icon: const Icon(Icons.add_a_photo,
@@ -398,7 +398,12 @@ class ConfirimButton extends StatelessWidget {
                 style: ButtonStyle(
                     overlayColor:
                         MaterialStateProperty.all(Colors.transparent)),
-                onPressed: () {
+                onPressed: () async {
+                  state.isLogin == false && state.photoUrl != null
+                      ? await FirebaseStorage.instance
+                          .refFromURL(state.photoUrl!)
+                          .delete()
+                      : null;
                   context
                       .read<AuthBloc>()
                       .add(AuthChangeType(loginType: !state.isLogin));
