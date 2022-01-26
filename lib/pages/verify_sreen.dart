@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -10,8 +12,10 @@ import 'package:weathershmeather/pages/auth_screen.dart';
 
 class VerifyScreen extends StatefulWidget {
   final String displayName;
-  final String? photoUrl;
-  const VerifyScreen({required this.displayName, this.photoUrl, Key? key})
+  final String? filePath;
+  final FilePickerResult? result;
+  const VerifyScreen(
+      {required this.displayName, this.filePath, this.result, Key? key})
       : super(key: key);
 
   @override
@@ -49,11 +53,8 @@ class _VerifyScreenState extends State<VerifyScreen> {
       appBar: AppBar(
         title: const Text('Email Verification'),
         leading: IconButton(
-          onPressed: () async {
+          onPressed: () {
             user.delete();
-            await FirebaseStorage.instance
-                .refFromURL(widget.photoUrl!)
-                .delete();
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
@@ -85,13 +86,28 @@ class _VerifyScreenState extends State<VerifyScreen> {
     if (user.emailVerified) {
       timer.cancel();
       await user.updateDisplayName(widget.displayName);
-      await user.updatePhotoURL(widget.photoUrl);
-      await _users.doc(user.uid).set({
-        'uid': user.uid,
-        'email': user.email,
-        'displayName': widget.displayName,
-        'photoUrl': widget.photoUrl,
-      });
+      if (widget.result != null && widget.filePath != null) {
+        final fileName = widget.result!.files.single.name;
+        final firebaseSorage = FirebaseStorage.instance;
+        final file = File(widget.filePath!);
+        await firebaseSorage.ref('images/$fileName').putFile(file);
+        final photoUrl =
+            await firebaseSorage.ref('images/$fileName').getDownloadURL();
+        await user.updatePhotoURL(photoUrl);
+        await _users.doc(user.uid).set({
+          'uid': user.uid,
+          'email': user.email,
+          'displayName': widget.displayName,
+          'photoUrl': photoUrl,
+        });
+      } else {
+        await _users.doc(user.uid).set({
+          'uid': user.uid,
+          'email': user.email,
+          'displayName': widget.displayName,
+          'photoUrl': null,
+        });
+      }
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
@@ -106,7 +122,6 @@ class _VerifyScreenState extends State<VerifyScreen> {
     if (timer.tick >= 120) {
       timer.cancel();
       user.delete();
-      await FirebaseStorage.instance.refFromURL(widget.photoUrl!).delete();
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(

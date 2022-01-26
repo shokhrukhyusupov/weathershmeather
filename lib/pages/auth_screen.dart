@@ -1,9 +1,8 @@
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:weathershmeather/bloc/auth_bloc/auth_bloc.dart';
@@ -51,7 +50,8 @@ class AuthScreen extends StatelessWidget {
                 MaterialPageRoute(
                     builder: (context) => VerifyScreen(
                         displayName: state.displayName,
-                        photoUrl: state.photoUrl)),
+                        filePath: state.filePath,
+                        result: state.result)),
                 (route) => false,
               );
             }
@@ -91,10 +91,10 @@ class AuthScreen extends StatelessWidget {
                                   child: CircleAvatar(
                                     radius: 60,
                                     backgroundColor: Colors.grey[200],
-                                    backgroundImage: state.fileUrl != null
-                                        ? FileImage(File(state.fileUrl!))
+                                    backgroundImage: state.filePath != null
+                                        ? FileImage(File(state.filePath!))
                                         : null,
-                                    child: state.fileUrl == null
+                                    child: state.filePath == null
                                         ? const Icon(Icons.person,
                                             size: 80, color: Colors.black38)
                                         : null,
@@ -104,9 +104,12 @@ class AuthScreen extends StatelessWidget {
                               Align(
                                 alignment: Alignment.bottomRight,
                                 child: IconButton(
-                                  onPressed: () {
+                                  onPressed: () async {
+                                    FilePickerResult? result = await FilePicker
+                                        .platform
+                                        .pickFiles(type: FileType.image);
                                     BlocProvider.of<AuthBloc>(context)
-                                        .add(AuthPhotoUrlChanged());
+                                        .add(AuthPhotoUrlChanged(result));
                                   },
                                   splashRadius: 1,
                                   icon: const Icon(Icons.add_a_photo,
@@ -399,11 +402,6 @@ class ConfirimButton extends StatelessWidget {
                     overlayColor:
                         MaterialStateProperty.all(Colors.transparent)),
                 onPressed: () async {
-                  state.isLogin == false && state.photoUrl != null
-                      ? await FirebaseStorage.instance
-                          .refFromURL(state.photoUrl!)
-                          .delete()
-                      : null;
                   context
                       .read<AuthBloc>()
                       .add(AuthChangeType(loginType: !state.isLogin));

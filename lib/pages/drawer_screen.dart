@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:weathershmeather/bloc/auth_bloc/auth_bloc.dart';
@@ -44,13 +43,13 @@ class DrawerScreen extends StatelessWidget {
                               backgroundImage: NetworkImage(photoUrl!),
                               radius: 30)
                           : Container(
-                              width: 100,
-                              height: 100,
+                              width: 50,
+                              height: 50,
                               decoration: BoxDecoration(
                                   color: Colors.blue,
                                   borderRadius: BorderRadius.circular(15)),
                               child: const Icon(Icons.person,
-                                  color: Colors.white, size: 32)),
+                                  color: Colors.white, size: 28)),
                       const SizedBox(height: 15),
                       Text(displayName,
                           style: const TextStyle(
@@ -76,23 +75,6 @@ class DrawerScreen extends StatelessWidget {
                   minLeadingWidth: 0,
                   title: const Text('Choosing city',
                       style: TextStyle(fontSize: 14)),
-                ),
-                ListTile(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => BlocProvider(
-                          create: (_) => MapsTypeBloc(),
-                          child: const MapsScreen(),
-                        ),
-                      ),
-                    );
-                  },
-                  leading:
-                      const Icon(Icons.map_rounded, color: Color(0xFF5897FD)),
-                  minLeadingWidth: 0,
-                  title: const Text('Maps', style: TextStyle(fontSize: 14)),
                 ),
                 ListTile(
                   onTap: () {},

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -15,7 +14,8 @@ import 'package:weathershmeather/components/maps_screen_components/places_search
 import 'package:weathershmeather/cubit/maps_type_cubit.dart';
 
 class MapsScreen extends StatefulWidget {
-  const MapsScreen({Key? key}) : super(key: key);
+  final GoogleMapController googleMapController;
+  const MapsScreen({Key? key, required this.googleMapController}) : super(key: key);
 
   @override
   State<MapsScreen> createState() => _MapsScreenState();
@@ -96,6 +96,7 @@ class _MapsScreenState extends State<MapsScreen>
                       searchController: searchController,
                       completer: completer,
                       places: state.places!,
+                      googleMapController: widget.googleMapController,
                     ),
                   ],
                 ),

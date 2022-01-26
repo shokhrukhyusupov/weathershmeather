@@ -1,8 +1,9 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:weathershmeather/bloc/auth_bloc/auth_status.dart';
 
 class AuthState {
-  final String? photoUrl;
-  final String? fileUrl;
+  final FilePickerResult? result;
+  final String? filePath;
   final String displayName;
   final String email;
   final String password;  
@@ -23,8 +24,8 @@ class AuthState {
   get validateConfirimPassword => password == confirimPassword;
 
   AuthState({
-    this.photoUrl,
-    this.fileUrl,
+    this.result,
+    this.filePath,
     this.displayName = '',
     this.email = '',
     this.password = '',
@@ -35,8 +36,8 @@ class AuthState {
     this.formStatus = const InitialStatus(),
   });
   AuthState copyWith({
-    String? photoUrl,
-    String? fileUrl,
+    FilePickerResult? result,
+    String? filePath,
     String? displayName,
     String? email,
     String? password,
@@ -47,8 +48,8 @@ class AuthState {
     FormSubmittionStatus? formStatus,
   }) {
     return AuthState(
-      photoUrl: photoUrl ?? this.photoUrl,
-      fileUrl: fileUrl ?? this.fileUrl,
+      result: result ?? this.result,
+      filePath: filePath ?? this.filePath,
       displayName: displayName ?? this.displayName,
       email: email ?? this.email,
       password: password ?? this.password,

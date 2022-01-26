@@ -6,9 +6,11 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:weathershmeather/bloc/maps_bloc/maps_bloc.dart';
 import 'package:weathershmeather/bloc/maps_bloc/maps_event.dart';
+import 'package:weathershmeather/components/home_screen_components/locatia.dart';
 import 'package:weathershmeather/models/place.dart';
 
 class PlacesSearchBar extends StatelessWidget {
+  final GoogleMapController googleMapController;
   final Animation<Offset> offset;
   final FloatingSearchBarController searchController;
   final Completer<GoogleMapController> completer;
@@ -18,6 +20,7 @@ class PlacesSearchBar extends StatelessWidget {
       required this.searchController,
       required this.completer,
       required this.places,
+      required this.googleMapController,
       Key? key})
       : super(key: key);
 
@@ -76,6 +79,10 @@ class PlacesSearchBar extends StatelessWidget {
                   subtitle: Text(places[i].formattedAddress),
                   onTap: () async {
                     final mapController = await completer.future;
+                    googleMapController
+                        .animateCamera(CameraUpdate.newCameraPosition(
+                            CameraPosition(
+                                target: LatLng(places[i].lat, places[i].lng))));
                     mapController.animateCamera(
                       CameraUpdate.newCameraPosition(
                         CameraPosition(

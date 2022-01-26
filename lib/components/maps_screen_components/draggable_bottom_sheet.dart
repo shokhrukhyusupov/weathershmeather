@@ -16,7 +16,9 @@ class DraggableBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<MapsBloc, MapsState>(builder: (context, state) {
       if (state.mapsStatus is MapsLoadedSuccess) {
-        List formattedAddress = (state.places![0].formattedAddress).split(', ');
+        List formattedAddress = state.place != null
+            ? state.place!.formattedAddress.split(', ')
+            : (state.places![0].formattedAddress).split(', ');
         return SlideTransition(
           position: offset,
           child: DraggableScrollableSheet(
@@ -63,7 +65,9 @@ class DraggableBottomSheet extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            state.places![0].placeName,
+                            state.place != null
+                                ? state.place!.placeName
+                                : state.places![0].placeName,
                             style: const TextStyle(
                                 color: Colors.black, fontSize: 19),
                           ),

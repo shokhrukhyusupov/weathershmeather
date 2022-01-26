@@ -1,6 +1,3 @@
-import 'dart:async';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -16,11 +13,11 @@ class Locatia extends StatefulWidget {
   const Locatia(this.currentWeather, {Key? key}) : super(key: key);
 
   @override
-  State<Locatia> createState() => _LocatiaState();
+  State<Locatia> createState() => LocatiaState();
 }
 
-class _LocatiaState extends State<Locatia> with SingleTickerProviderStateMixin {
-  final Completer<GoogleMapController> completer = Completer();
+class LocatiaState extends State<Locatia> with SingleTickerProviderStateMixin {
+  late GoogleMapController googleMapController;
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<MapsBloc, MapsState>(builder: (context, state) {
@@ -34,7 +31,9 @@ class _LocatiaState extends State<Locatia> with SingleTickerProviderStateMixin {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    state.places![0].formattedAddress,
+                    state.place != null
+                        ? state.place!.formattedAddress
+                        : state.places![0].formattedAddress,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -66,7 +65,8 @@ class _LocatiaState extends State<Locatia> with SingleTickerProviderStateMixin {
                             builder: (BuildContext context) {
                               return BlocProvider(
                                 create: (context) => MapsTypeBloc(),
-                                child: const MapsScreen(),
+                                child: MapsScreen(
+                                    googleMapController: googleMapController),
                               );
                             },
                           ),
@@ -75,11 +75,13 @@ class _LocatiaState extends State<Locatia> with SingleTickerProviderStateMixin {
                       myLocationButtonEnabled: false,
                       zoomControlsEnabled: false,
                       initialCameraPosition: CameraPosition(
-                          target: LatLng(
-                              state.places![0].lat, state.places![0].lng),
-                          zoom: 6),
+                          target: state.place != null
+                              ? LatLng(state.place!.lat, state.place!.lng)
+                              : LatLng(
+                                  state.places![0].lat, state.places![0].lng),
+                          zoom: 12),
                       onMapCreated: (controller) =>
-                          completer.complete(controller),
+                          googleMapController = controller,
                     ),
                   ),
                 );
